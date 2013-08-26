@@ -2,11 +2,6 @@
 import re
 
 
-class Cons():
-    car = None
-    cdr = None
-
-
 class Environment():
     pass
 
@@ -14,6 +9,14 @@ class Environment():
 class Function():
     env = None
     pass
+
+
+def car(cons):
+    return cons[0]
+
+
+def cdr(cons):
+    return cons[1]
 
 
 def parser(statement):
@@ -45,12 +48,29 @@ def liquidator(statement):
 
 
 def lexical_analyzer(statement):
+    # TODO: Error.
+    statement = statement.replace("(", " ( ")
+    statement = statement.replace(")", " ) ")
     statement = liquidator(statement)
-    pass
+    tree = []
+    stack = []
+    for block in statement.split(" "):
+        current = tree
+        for index in stack:
+            current = current[index]
+        num = len(current)
+        if block is "(":
+            current.append([])
+            stack.append(num)
+        elif block is ")":
+            stack.pop()
+        else:
+            current.append(block)
+    return tree
 
 
 def main():
-    print("Schepy - scheme lite interpreter. 0.00")
+    print("Schepy - scheme lite interpreter 0.00")
     print("by Soar Tsui <tioover@gmail.com>")
     env = Environment()
     while True:
