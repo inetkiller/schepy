@@ -32,7 +32,7 @@ def lexical_analyzer(statement):
 
 
 def main():
-    print("0.00")
+    print("Schepy - scheme lite interpreter. 0.00")
     print("by Soar Tsui <tioover@gmail.com>")
     env = Environment()
     while True:
