@@ -1,8 +1,18 @@
 #!/bin/env python3
-# import re
+import re
+
+
+class Cons():
+    car = None
+    cdr = None
 
 
 class Environment():
+    pass
+
+
+class Function():
+    env = None
     pass
 
 
@@ -19,10 +29,18 @@ def printer(result):
 
 
 def liquidator(statement):
-    #replace_table = {
-    #    "#(": "(vector"
-    #}.items()
-    statement = statement.replace("")
+    re_table = {
+        r"^\s+": "",
+        r"\s+$": "",
+        r"\s+": " ",
+        r"#\(": "(vector",
+        r"`": "'",
+        r"'\(": "(quote",
+        # TODO: (define (foo bar)()) => (define foo (lambda bar ()))
+        # TODO: (foo . bar) => (cons foo bar)
+    }
+    for pattern, repl in re_table.items():
+        statement = re.sub(pattern, repl, statement)
     return statement
 
 
