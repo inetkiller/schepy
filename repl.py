@@ -6,6 +6,13 @@ from objects import Cons, Environment, Nil
 
 
 def atom_evaler(env, atom, isfunc=False):
+    if atom in env:
+        atom = env[atom]
+    else:
+        try:
+            atom = eval(atom)  # TODO: Some datatype only.
+        except (NameError, SyntaxError):
+            raise NameError("Not this object.")
     return atom
 
 
@@ -100,8 +107,8 @@ def main():
             #printer(ealuator(env, parser(lexical_analyzer(statement))))
             for tree in lexical_analyzer(statement):
                 print(parser(env, tree))
-        except SyntaxError as e:
-            print("SyntaxError: ", format(e))
+        except (SyntaxError, NameError) as e:
+            print(e.__class__.__name__, ": ", format(e))
 
 
 def run(s):
