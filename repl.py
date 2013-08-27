@@ -36,7 +36,8 @@ def parser(env, tree):
             header.cdr.car = cons
             prev_cons = cons
         else:
-            i = atom_evaler(env, i, isfunc=False)
+            if type(i) is not Cons:
+                i = atom_evaler(env, i, isfunc=False)
             cons = Cons(i, Nil())
             prev_cons.cdr = cons
             prev_cons = cons
@@ -45,9 +46,20 @@ def parser(env, tree):
     return header
 
 
+def is_tree(tree):
+    try:
+        return tree.cdr.cdr == Nil() and type(tree.cdr.car) is Cons
+    except AttributeError:
+        return False
+
+
 def ealuator(env, tree):
     func = tree.car
     argulist = list(tree.cdr.car)
+    for index, atom in enumerate(argulist):
+        if is_tree(atom):
+            argulist[index] = ealuator(env, atom)
+
     return func(*argulist)
 
 
@@ -95,7 +107,7 @@ def lexical_analyzer(statement):
 
 
 def main():
-    print("Schepy - scheme lite interpreter 0.00")
+    print("Schepy - scheme lite interpreter 0.01")
     print("by Soar Tsui <tioover@gmail.com>")
     line = 1
     env = Environment()

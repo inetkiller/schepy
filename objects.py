@@ -1,7 +1,11 @@
 class Environment(dict):
-    def __init__(self):
+    def __init__(self, parent=None):
         super(Environment, self).__init__()
+        self.parant = parent
         self["+"] = lambda a, b: a+b
+        self["-"] = lambda a, b: a-b
+        self["*"] = lambda a, b: a*b
+        self["/"] = lambda a, b: a/b
 
 
 class Function():
@@ -53,7 +57,7 @@ class Cons():
     def __len__(self):
         length = 0
         current = self
-        while current.__class__ is Cons:
+        while type(current) is Cons:
             length += 1
             current = current.cdr
         return length
@@ -77,11 +81,11 @@ class Cons():
     def __repr__(self):
         if self.cdr == Nil():
             return "(%s)" % (str(self.car))
-        if self.cdr.__class__ is not Cons:
+        if type(self.cdr) is not Cons:
             return "(cons %s %s)" % (str(self.car), str(self.cdr))
         string = "("+str(self.car)
         current = self.cdr
-        while current.__class__ is Cons:
+        while type(current) is Cons:
             string += " " + str(current.car)
             current = current.cdr
         if current == Nil():
