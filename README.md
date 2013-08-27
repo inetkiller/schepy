@@ -1,4 +1,7 @@
-schepy
+Schepy
 ======
 
-Schepy is a interpreter and a subset of scheme. 
+Schepy is an LISP interpreter and a subset of scheme.
+
+## Status
+Unavailable, not complete.

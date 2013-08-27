@@ -73,4 +73,3 @@ def make_cons_list(li):
             prev_cons.cdr = cons
             prev_cons = cons
     return header
-
