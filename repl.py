@@ -67,7 +67,8 @@ def main():
         statement = input("> ")
         try:
             #printer(ealuator(env, parser(lexical_analyzer(statement))))
-            parser(lexical_analyzer(statement))
+            for tree in lexical_analyzer(statement):
+                parser(tree)
         except SyntaxError as e:
             print("SyntaxError: ", format(e))
 

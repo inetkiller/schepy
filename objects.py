@@ -1,9 +1,10 @@
-class Environment():
+class Environment(dict):
     pass
 
 
 class Function():
     env = None
+    arguments = []
     pass
 
 
@@ -43,6 +44,8 @@ class Cons():
         self.cdr = cdr
 
     def __repr__(self):
+        if self.cdr == Nil():
+            return "(%s)" % (str(self.car))
         if self.cdr.__class__ is not Cons:
             return "(cons %s %s)" % (str(self.car), str(self.cdr))
         string = "("+str(self.car)
@@ -58,8 +61,6 @@ class Cons():
 
 
 def make_cons_list(li):
-    if not li:
-        return None
     header = None
     prev_cons = None
     for i in li:
@@ -72,4 +73,6 @@ def make_cons_list(li):
             cons = Cons(i, Nil())
             prev_cons.cdr = cons
             prev_cons = cons
+    if header is None:
+        raise SyntaxError("had empty list.")
     return header
