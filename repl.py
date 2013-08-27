@@ -1,32 +1,7 @@
 #!/bin/env python3
 import re
-
-
-class Environment():
-    pass
-
-
-class Function():
-    env = None
-    pass
-
-
-class Cons():
-    car = None
-    cdr = None
-
-    def __init__(self, car, cdr):
-        self.car = car
-        self.cdr = cdr
-
-
-class List():
-    def __init__(self, *li):
-        prev_cons = None
-        for i in li:
-            cons = Cons(i, None)
-            prev_cons.cdr = cons
-            prev_cons = cons
+# import operators
+# import objects
 
 
 def parser(statement):
@@ -50,7 +25,6 @@ def liquidator(statement):
         r"`": "'",
         r"'\(": "(quote",
         # TODO: (define (foo bar)()) => (define foo (lambda bar ()))
-        # TODO: (foo . bar) => (cons foo bar)
     }
     statement = statement.replace("(", " ( ")
     statement = statement.replace(")", " ) ")
