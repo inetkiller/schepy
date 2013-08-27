@@ -52,14 +52,14 @@ def liquidator(statement):
         # TODO: (define (foo bar)()) => (define foo (lambda bar ()))
         # TODO: (foo . bar) => (cons foo bar)
     }
+    statement = statement.replace("(", " ( ")
+    statement = statement.replace(")", " ) ")
     for pattern, repl in re_table.items():
         statement = re.sub(pattern, repl, statement)
     return statement
 
 
 def lexical_analyzer(statement):
-    statement = statement.replace("(", " ( ")
-    statement = statement.replace(")", " ) ")
     statement = liquidator(statement)
     tree = []
     stack = []
@@ -76,6 +76,8 @@ def lexical_analyzer(statement):
                 stack.pop()
             except IndexError:
                 raise SyntaxError("read: unexpected `)")
+        elif block is ".":
+            current.insert(0, "cons")
         else:
             current.append(block)
     if stack:
