@@ -4,8 +4,8 @@ import re
 # import objects
 
 
-def parser(statement):
-    pass
+def parser(tree):
+    print(tree)
 
 
 def ealuator(env, tree):
@@ -67,7 +67,7 @@ def main():
         statement = input("> ")
         try:
             #printer(ealuator(env, parser(lexical_analyzer(statement))))
-            print(lexical_analyzer(statement))
+            parser(lexical_analyzer(statement))
         except SyntaxError as e:
             print("SyntaxError: ", format(e))
 
