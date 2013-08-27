@@ -48,7 +48,6 @@ def liquidator(statement):
 
 
 def lexical_analyzer(statement):
-    # TODO: Error.
     statement = statement.replace("(", " ( ")
     statement = statement.replace(")", " ) ")
     statement = liquidator(statement)
@@ -63,19 +62,32 @@ def lexical_analyzer(statement):
             current.append([])
             stack.append(num)
         elif block is ")":
-            stack.pop()
+            try:
+                stack.pop()
+            except IndexError:
+                raise SyntaxError("read: unexpected `)")
         else:
             current.append(block)
+    if stack:
+        raise SyntaxError("read: lack `)")
     return tree
 
 
 def main():
     print("Schepy - scheme lite interpreter 0.00")
     print("by Soar Tsui <tioover@gmail.com>")
-    env = Environment()
+    #env = Environment()
     while True:
         statement = input("> ")
-        printer(ealuator(env, parser(lexical_analyzer(statement))))
+        try:
+            #printer(ealuator(env, parser(lexical_analyzer(statement))))
+            print(lexical_analyzer(statement))
+        except SyntaxError as e:
+            print("SyntaxError: ", format(e))
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except EOFError:
+        print("")
+        exit()
