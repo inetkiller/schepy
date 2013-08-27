@@ -36,6 +36,7 @@ def parser(env, tree):
             header.cdr.car = cons
             prev_cons = cons
         else:
+            i = atom_evaler(env, i, isfunc=False)
             cons = Cons(i, Nil())
             prev_cons.cdr = cons
             prev_cons = cons
@@ -45,7 +46,9 @@ def parser(env, tree):
 
 
 def ealuator(env, tree):
-    pass
+    func = tree.car
+    argulist = list(tree.cdr.car)
+    return func(*argulist)
 
 
 def liquidator(statement):
@@ -98,17 +101,14 @@ def main():
     env = Environment()
     while True:
         statement = input("[%d] > " % line)
-        line += 1
         try:
             #printer(ealuator(env, parser(lexical_analyzer(statement))))
             for tree in lexical_analyzer(statement):
-                print((parser(env, tree)))
+                print("[%d] : %s" % (line, ealuator(env, parser(env, tree))))
         except (SyntaxError, NameError) as e:
             print(e.__class__.__name__, ": ", format(e))
+        line += 1
 
-
-def run(s):
-    return parser(Environment(), lexical_analyzer(s)[0])
 
 if __name__ == '__main__':
     try:
