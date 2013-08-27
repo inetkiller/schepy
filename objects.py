@@ -47,13 +47,13 @@ class Cons():
             return "(cons %s %s)" % (str(self.car), str(self.cdr))
         string = "("+str(self.car)
         current = self.cdr
-        while current.cdr.__class__ is Cons:
+        while current.__class__ is Cons:
             string += " " + str(current.car)
             current = current.cdr
-        if current.cdr == Nil():
-            string += " " + str(current.car) + ")"
+        if current == Nil():
+            string += ")"
         else:
-            string += " . " + str(current.cdr) + ")"
+            string += " . " + str(current) + ")"
         return string
 
 
