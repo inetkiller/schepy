@@ -11,12 +11,22 @@ class Function():
     pass
 
 
-def car(cons):
-    return cons[0]
+class Cons():
+    car = None
+    cdr = None
+
+    def __init__(self, car, cdr):
+        self.car = car
+        self.cdr = cdr
 
 
-def cdr(cons):
-    return cons[1]
+class List():
+    def __init__(self, *li):
+        prev_cons = None
+        for i in li:
+            cons = Cons(i, None)
+            prev_cons.cdr = cons
+            prev_cons = cons
 
 
 def parser(statement):
