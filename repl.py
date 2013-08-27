@@ -48,10 +48,6 @@ def ealuator(env, tree):
     pass
 
 
-def printer(result):
-    pass
-
-
 def liquidator(statement):
     re_table = {
         r"^\s+": "",
@@ -106,7 +102,7 @@ def main():
         try:
             #printer(ealuator(env, parser(lexical_analyzer(statement))))
             for tree in lexical_analyzer(statement):
-                print(parser(env, tree))
+                print((parser(env, tree)))
         except (SyntaxError, NameError) as e:
             print(e.__class__.__name__, ": ", format(e))
 

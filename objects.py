@@ -1,11 +1,12 @@
 class Environment(dict):
-    pass
+    def __init__(self):
+        super(Environment, self).__init__()
+        self["+"] = lambda a, b: a+b
 
 
 class Function():
     env = None
     arguments = []
-    pass
 
 
 class Symbol():
@@ -42,6 +43,36 @@ class Cons():
     def __init__(self, car, cdr):
         self.car = car
         self.cdr = cdr
+
+    def __eq__(a, b):
+        if hasattr(b, "car") and hasattr(b, "cdr"):
+            return (a.car == b.car and a.cdr == b.cdr)
+        else:
+            return False
+
+    def __len__(self):
+        length = 0
+        current = self
+        while current.__class__ is Cons:
+            length += 1
+            current = current.cdr
+        return length
+
+    def __iter__(self):
+        self.current = self
+        self.stop_flag = False
+        return self
+
+    def __next__(self):
+        if self.stop_flag:
+            raise StopIteration
+        elif self.current.cdr == Nil():
+            self.stop_flag = True
+            return self.current.car
+        else:
+            result = self.current.car
+            self.current = self.current.cdr
+            return result
 
     def __repr__(self):
         if self.cdr == Nil():
