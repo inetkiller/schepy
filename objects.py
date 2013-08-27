@@ -58,21 +58,3 @@ class Cons():
         else:
             string += " . " + str(current) + ")"
         return string
-
-
-def make_cons_list(li):
-    header = None
-    prev_cons = None
-    for i in li:
-        if type(i) is list:
-            i = make_cons_list(i)
-        if not header:
-            header = Cons(i, Nil())
-            prev_cons = header
-        else:
-            cons = Cons(i, Nil())
-            prev_cons.cdr = cons
-            prev_cons = cons
-    if header is None:
-        raise SyntaxError("had empty list.")
-    return header

@@ -1,11 +1,40 @@
 #!/bin/env python3
 import re
+import readline
 # import operators
-# import objects
+from objects import Cons, Environment, Nil
 
 
-def parser(tree):
-    print(tree)
+def atom_evaler(env, atom, isfunc=False):
+    return atom
+
+
+def parser(env, tree):
+    if type(tree) is not list:
+        return atom_evaler(env, tree)
+    header = None
+    prev_cons = None
+    for i in tree:
+        if type(i) is list:
+            i = parser(env, i)
+        if len(tree) is 1:
+            i = atom_evaler(env, i, isfunc=True)
+            header = Cons(i, Nil())
+        elif header is None:
+            i = atom_evaler(env, i, isfunc=True)
+            header = Cons(i, Cons(None, Nil()))
+        elif header.cdr.car is None:
+            i = atom_evaler(env, i, isfunc=False)
+            cons = Cons(i, Nil())
+            header.cdr.car = cons
+            prev_cons = cons
+        else:
+            cons = Cons(i, Nil())
+            prev_cons.cdr = cons
+            prev_cons = cons
+    if header is None:
+        raise SyntaxError("had empty list.")
+    return header
 
 
 def ealuator(env, tree):
@@ -62,19 +91,25 @@ def lexical_analyzer(statement):
 def main():
     print("Schepy - scheme lite interpreter 0.00")
     print("by Soar Tsui <tioover@gmail.com>")
-    #env = Environment()
+    line = 1
+    env = Environment()
     while True:
-        statement = input("> ")
+        statement = input("[%d] > " % line)
+        line += 1
         try:
             #printer(ealuator(env, parser(lexical_analyzer(statement))))
             for tree in lexical_analyzer(statement):
-                parser(tree)
+                print(parser(env, tree))
         except SyntaxError as e:
             print("SyntaxError: ", format(e))
+
+
+def run(s):
+    return parser(Environment(), lexical_analyzer(s)[0])
 
 if __name__ == '__main__':
     try:
         main()
-    except EOFError:
+    except (EOFError, KeyboardInterrupt):
         print("")
         exit()
