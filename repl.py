@@ -5,25 +5,40 @@ import readline
 from objects import Cons, MainEnvironment, Nil, Symbol
 
 
+def to_symbol(atom):
+    if type(atom) is str:
+        return atom
+    assert(type(atom) is list)
+    result = "("
+    for i in atom:
+        result += to_symbol(i) + " "
+    if result[-1] is " ":
+        result = result[:-1]
+    return result + ")"
+
+
 def parser(tree):
     if type(tree) is not list:
         return tree
+    if tree[0] == "quote":
+        if len(tree) > 2:
+            raise SyntaxError("To many argument.")
+        return Symbol("\'"+to_symbol(tree[1]))
     header = None
     prev_cons = None
-    for i in tree:
-        if type(i) is list:
-            i = parser(i)  # Recursion parser list.
-
+    for atom in tree:
+        if type(atom) is list:
+            atom = parser(atom)  # Recursion parser list.
         if len(tree) is 1:
-            header = Cons(i, Nil())
+            header = Cons(atom, Nil())
         elif header is None:
-            header = Cons(i, Cons(None, Nil()))
+            header = Cons(atom, Cons(None, Nil()))
         elif header.cdr.car is None:
-            cons = Cons(i, Nil())
+            cons = Cons(atom, Nil())
             header.cdr.car = cons
             prev_cons = cons
         else:
-            cons = Cons(i, Nil())
+            cons = Cons(atom, Nil())
             prev_cons.cdr = cons
             prev_cons = cons
     if header is None:
@@ -50,6 +65,8 @@ def env_finder(env, atom):
 
 
 def atom_evaler(env, atom, isfunc=False):
+    if type(atom) is Symbol:
+        return atom
     result = env_finder(env, atom)
     if result is None:
         if atom[0] == "\'":
@@ -85,9 +102,6 @@ def liquidator(statement):
         r"^\s+": "",
         r"\s+$": "",
         r"\s+": " ",
-        r"#\(": "(vector",
-        r"`": "'",
-        r"'\(": "(quote",
         # TODO: (define (foo bar)()) => (define foo (lambda bar ()))
     }
     statement = statement.replace("(", " ( ")
@@ -130,13 +144,16 @@ def main():
     env = MainEnvironment()
     while True:
         statement = input("[%d] > " % line)
-        try:
-            #printer(ealuator(env, parser(lexical_analyzer(statement))))
-            for tree in lexical_analyzer(statement):
-                print("[%d] : %s" % (line, ealuator(env, parser(tree))))
-        except (SyntaxError, NameError) as e:
-            print(e.__class__.__name__, ": ", format(e))
-        line += 1
+        if statement:
+            try:
+                for tree in lexical_analyzer(statement):
+                    out = tree  # lexical_analyzer debug.
+                    out = parser(out)  # parser debug.
+                    out = ealuator(env, out)
+                    print("[%d] : %s" % (line, out))
+            except (SyntaxError, NameError) as e:
+                print(e.__class__.__name__, ": ", format(e))
+            line += 1
 
 
 if __name__ == '__main__':

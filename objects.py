@@ -11,11 +11,6 @@ class MainEnvironment(Environment):
         self["-"] = lambda a, b: a-b
         self["*"] = lambda a, b: a*b
         self["/"] = lambda a, b: a/b
-        self["define"] = self.define
-
-    def define(self, name, value):
-        self[name] = value
-        return self[name]
 
 
 class Function():
