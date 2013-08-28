@@ -2,27 +2,27 @@
 import re
 import readline
 # import operators
-from objects import Cons, MainEnvironment, Nil, Symbol
+from objects import Cons, MainEnvironment, nil, Symbol
 
 
 def parser(tree):
     if type(tree) is not list:
         return tree
-    header = Cons(Nil(), Nil())
+    header = Cons(nil, nil)
     prev_cons = None
     for atom in tree:
         if type(atom) is list:
             atom = parser(atom)  # Recursion parser list.
         if len(tree) is 1:
-            header = Cons(atom, Nil())
+            header = Cons(atom, nil)
         elif not header:
-            header = Cons(atom, Cons(None, Nil()))
+            header = Cons(atom, Cons(None, nil))
         elif header.cdr.car is None:
-            cons = Cons(atom, Nil())
+            cons = Cons(atom, nil)
             header.cdr.car = cons
             prev_cons = cons
         else:
-            cons = Cons(atom, Nil())
+            cons = Cons(atom, nil)
             prev_cons.cdr = cons
             prev_cons = cons
         # raise SyntaxError("Can't parser empty list.")
@@ -31,7 +31,7 @@ def parser(tree):
 
 def is_tree(tree):
     try:
-        return tree.cdr.cdr == Nil() and type(tree.cdr.car) is Cons
+        return tree.cdr.cdr == nil and type(tree.cdr.car) is Cons
     except AttributeError:
         return False
 
@@ -51,7 +51,7 @@ def atom_evaler(env, atom, isfunc=False):
     if type(atom) is Symbol:
         return atom
     elif atom is None:
-        return Nil()
+        return nil
     result = env_finder(env, atom)
     if result is None:
         if atom[0] == "\'":
@@ -71,7 +71,7 @@ def ealuator(env, tree):
     if func == "define":
         li = tree.cdr.car
         env[li.car] = atom_evaler(env, li.cdr.car)
-        return Nil()
+        return nil
     elif func == "quote":
         symbol = tree.cdr.car.car
         return Symbol(symbol)

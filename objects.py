@@ -54,6 +54,9 @@ class Nil():
         return False
 
 
+nil = Nil()
+
+
 class Cons():
     car = None
     cdr = None
@@ -84,7 +87,7 @@ class Cons():
     def __next__(self):
         if self.stop_flag:
             raise StopIteration
-        elif self.current.cdr == Nil():
+        elif self.current.cdr == nil:
             self.stop_flag = True
             return self.current.car
         else:
@@ -93,11 +96,11 @@ class Cons():
             return result
 
     def __bool__(self):
-        return self.car != Nil() or self.cdr != Nil()
+        return self.car != nil or self.cdr != nil
 
     def __str__(self):
-        if self.cdr == Nil():
-            if self.car == Nil():
+        if self.cdr == nil:
+            if self.car == nil:
                 return "()"
             else:
                 return "(%s)" % (str(self.car))
@@ -109,7 +112,7 @@ class Cons():
         while type(current) is Cons:
             string += " " + str(current.car)
             current = current.cdr
-        if current == Nil():
+        if current == nil:
             string += ")"
         else:
             string += " . " + str(current) + ")"
