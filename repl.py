@@ -2,47 +2,32 @@
 import re
 import readline
 # import operators
-from objects import Cons, Environment, Nil
+from objects import Cons, MainEnvironment, Nil, Symbol
 
 
-def atom_evaler(env, atom, isfunc=False):
-    if atom in env:
-        atom = env[atom]
-    else:
-        try:
-            atom = eval(atom)  # TODO: Some datatype only.
-        except (NameError, SyntaxError):
-            raise NameError("Not this object.")
-    return atom
-
-
-def parser(env, tree):
+def parser(tree):
     if type(tree) is not list:
-        return atom_evaler(env, tree)
+        return tree
     header = None
     prev_cons = None
     for i in tree:
         if type(i) is list:
-            i = parser(env, i)
+            i = parser(i)  # Recursion parser list.
+
         if len(tree) is 1:
-            i = atom_evaler(env, i, isfunc=True)
             header = Cons(i, Nil())
         elif header is None:
-            i = atom_evaler(env, i, isfunc=True)
             header = Cons(i, Cons(None, Nil()))
         elif header.cdr.car is None:
-            i = atom_evaler(env, i, isfunc=False)
             cons = Cons(i, Nil())
             header.cdr.car = cons
             prev_cons = cons
         else:
-            if type(i) is not Cons:
-                i = atom_evaler(env, i, isfunc=False)
             cons = Cons(i, Nil())
             prev_cons.cdr = cons
             prev_cons = cons
     if header is None:
-        raise SyntaxError("had empty list.")
+        raise SyntaxError("Can't parser empty list.")
     return header
 
 
@@ -53,13 +38,45 @@ def is_tree(tree):
         return False
 
 
+def env_finder(env, atom):
+    current = env
+    result = None
+    while current is not None:
+        if atom in current:
+            result = current[atom]
+            break
+        current = current.parent
+    return result
+
+
+def atom_evaler(env, atom, isfunc=False):
+    result = env_finder(env, atom)
+    if result is None:
+        if atom[0] == "\'":
+            result = Symbol(atom)
+        else:
+            try:
+                result = eval(atom)  # TODO: Some datatype only.
+            except (NameError, SyntaxError):
+                raise NameError("This is not an object.")
+    return result
+
+
 def ealuator(env, tree):
+    if not is_tree(tree):
+        return atom_evaler(env, tree)
     func = tree.car
+    if func == "define":
+        li = tree.cdr.car
+        env[li.car] = atom_evaler(env, li.cdr.car)
+        return Nil()
+    func = atom_evaler(env, tree.car, isfunc=True)
     argulist = list(tree.cdr.car)
     for index, atom in enumerate(argulist):
         if is_tree(atom):
             argulist[index] = ealuator(env, atom)
-
+        else:
+            argulist[index] = atom_evaler(env, atom)
     return func(*argulist)
 
 
@@ -110,13 +127,13 @@ def main():
     print("Schepy - scheme lite interpreter 0.01")
     print("by Soar Tsui <tioover@gmail.com>")
     line = 1
-    env = Environment()
+    env = MainEnvironment()
     while True:
         statement = input("[%d] > " % line)
         try:
             #printer(ealuator(env, parser(lexical_analyzer(statement))))
             for tree in lexical_analyzer(statement):
-                print("[%d] : %s" % (line, ealuator(env, parser(env, tree))))
+                print("[%d] : %s" % (line, ealuator(env, parser(tree))))
         except (SyntaxError, NameError) as e:
             print(e.__class__.__name__, ": ", format(e))
         line += 1

@@ -1,11 +1,21 @@
 class Environment(dict):
     def __init__(self, parent=None):
         super(Environment, self).__init__()
-        self.parant = parent
+        self.parent = parent
+
+
+class MainEnvironment(Environment):
+    def __init__(self, parent=None):
+        super(MainEnvironment, self).__init__()
         self["+"] = lambda a, b: a+b
         self["-"] = lambda a, b: a-b
         self["*"] = lambda a, b: a*b
         self["/"] = lambda a, b: a/b
+        self["define"] = self.define
+
+    def define(self, name, value):
+        self[name] = value
+        return self[name]
 
 
 class Function():
