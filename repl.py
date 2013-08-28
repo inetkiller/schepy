@@ -5,33 +5,17 @@ import readline
 from objects import Cons, MainEnvironment, Nil, Symbol
 
 
-def to_symbol(atom):
-    if type(atom) is str:
-        return atom
-    assert(type(atom) is list)
-    result = "("
-    for i in atom:
-        result += to_symbol(i) + " "
-    if result[-1] is " ":
-        result = result[:-1]
-    return result + ")"
-
-
 def parser(tree):
     if type(tree) is not list:
         return tree
-    if tree[0] == "quote":
-        if len(tree) > 2:
-            raise SyntaxError("To many argument.")
-        return Symbol("\'"+to_symbol(tree[1]))
-    header = None
+    header = Cons(Nil(), Nil())
     prev_cons = None
     for atom in tree:
         if type(atom) is list:
             atom = parser(atom)  # Recursion parser list.
         if len(tree) is 1:
             header = Cons(atom, Nil())
-        elif header is None:
+        elif not header:
             header = Cons(atom, Cons(None, Nil()))
         elif header.cdr.car is None:
             cons = Cons(atom, Nil())
@@ -41,8 +25,7 @@ def parser(tree):
             cons = Cons(atom, Nil())
             prev_cons.cdr = cons
             prev_cons = cons
-    if header is None:
-        raise SyntaxError("Can't parser empty list.")
+        # raise SyntaxError("Can't parser empty list.")
     return header
 
 
@@ -67,10 +50,12 @@ def env_finder(env, atom):
 def atom_evaler(env, atom, isfunc=False):
     if type(atom) is Symbol:
         return atom
+    elif atom is None:
+        return Nil()
     result = env_finder(env, atom)
     if result is None:
         if atom[0] == "\'":
-            result = Symbol(atom)
+            result = Symbol(atom[1:])
         else:
             try:
                 result = eval(atom)  # TODO: Some datatype only.
@@ -87,6 +72,9 @@ def ealuator(env, tree):
         li = tree.cdr.car
         env[li.car] = atom_evaler(env, li.cdr.car)
         return Nil()
+    elif func == "quote":
+        symbol = tree.cdr.car.car
+        return Symbol(symbol)
     func = atom_evaler(env, tree.car, isfunc=True)
     argulist = list(tree.cdr.car)
     for index, atom in enumerate(argulist):

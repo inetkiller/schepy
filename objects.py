@@ -19,10 +19,16 @@ class Function():
 
 
 class Symbol():
-    def __init__(self, string):
-        if string[0] is not "\'":
+    def __init__(self, atom):
+        if type(atom) is str:
+            self.symbol = atom
+        elif atom is None:
+            self.symbol = "()"
+        elif type(atom) is Cons:
+            self.symbol = str(atom)
+        else:
+            print(type(atom))
             raise SyntaxError("Not symbol.")
-        self.symbol = string[1:]
 
     def __str__(self):
         result = "'" + self.symbol
@@ -40,9 +46,12 @@ class Symbol():
         return self.symbol != "()"
 
 
-class Nil(Symbol):
-    def __init__(self):
-        super(Nil, self).__init__("'()")
+class Nil():
+    def __eq__(a, b):
+        return type(b) is Nil
+
+    def __bool__(self):
+        return False
 
 
 class Cons():
@@ -83,9 +92,16 @@ class Cons():
             self.current = self.current.cdr
             return result
 
-    def __repr__(self):
+    def __bool__(self):
+        return self.car != Nil() or self.cdr != Nil()
+
+    def __str__(self):
         if self.cdr == Nil():
-            return "(%s)" % (str(self.car))
+            if self.car == Nil():
+                return "()"
+            else:
+                return "(%s)" % (str(self.car))
+
         if type(self.cdr) is not Cons:
             return "(cons %s %s)" % (str(self.car), str(self.cdr))
         string = "("+str(self.car)
@@ -98,3 +114,6 @@ class Cons():
         else:
             string += " . " + str(current) + ")"
         return string
+
+    def __repr__(self):
+        return str(self)
